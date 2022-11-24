@@ -1,8 +1,8 @@
 import drawLineChart from './lineChart/index';
 import drawBarChart from './barChart/index';
 import drawAreaChart from './areaChart/index';
-// import drawDefaultChart from './defaultChart/index';
 import drawkLine from './kLine/index';
+import drawTimeShareChart from './timeShareChart/index'
 export default function(type) {
     switch (type) {
         case 'line':
@@ -13,8 +13,9 @@ export default function(type) {
             return drawAreaChart
         case 'kLine':
             return drawkLine
+        case 'timeShareChart': // 分时图
+            return drawTimeShareChart
         default:
-            // return drawDefaultChart
             break
     }
 }

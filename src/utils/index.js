@@ -7,10 +7,6 @@ export const withInstall = (comp) => {
   return comp;
 };
 
-export const test = () => {
-  console.log("测试方法导出");
-};
-
 // 树结构转对象
 export const treeToObj = (tree, obj, keys) => {
   Object.keys(tree).forEach((k) => {

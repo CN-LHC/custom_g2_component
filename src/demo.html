@@ -16,6 +16,11 @@
 <body>
     <div class="container">
         <g2-chart id="g2Chart"
+            data-chart-type="timeShareChart"
+            data-api-config=''
+            data-chart-config=''
+        ></g2-chart>
+        <g2-chart id="g2Chart"
             data-chart-type="kLine"
             data-api-config='{"url":"https://dtdataapi.wedengta.com/FinanceValue/day_qt_performance","body":{"SecuCode":"001336", "days":"60日"},"selectKeys":["TradingDay", "OpenPrice","HighPrice","LowPrice", "ClosePrice"]}'
             data-chart-config='{}'

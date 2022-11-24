@@ -24,7 +24,7 @@ class G2_Chart extends HTMLElement {
   }
   // 画图
   drawChart() {
-    if (this.chart) {
+    if (this.chart?.destroy) {
       this.chart.destroy();
     }
     return new Promise(async (resolve, reject) => {
@@ -51,13 +51,12 @@ class G2_Chart extends HTMLElement {
       if (this.getAttribute('data-chart-type')) {
         try {
           this.chart = currentChart(this.getAttribute('data-chart-type'))(this.shadowRoot.childNodes[0], chartData, chartConfig instanceof Object && Object.keys(chartConfig).length > 0 ? chartConfig : null, this.dataApiConfig)
-          this.chart.render()
+          if (this.chart?.render) {
+            this.chart.render()
+          }
         } catch (error) {
           reject(error)
         }
-      } else {
-        this.chart = currentChart(this.getAttribute('data-chart-type'))(this.shadowRoot.childNodes[0])
-        console.log('渲染编辑器添加的组件')
       }
       // 抛出renderChart事件, 表示图表已渲染完成
       let event = new CustomEvent('renderChart', { detail: this })
@@ -74,7 +73,7 @@ class G2_Chart extends HTMLElement {
   }
   // 自定义组件删除回调
   disconnectedCallback() {
-    if (this.chart) {
+    if (this.chart?.destroy) {
       this.chart.destroy();
     }
     // 注销监听自定义组件尺寸改变

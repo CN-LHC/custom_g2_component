@@ -20,7 +20,7 @@ function drawkLine(container, data, config = {}) {
     const chart = new Chart({
         container: container,
         autoFit: true,
-        // padding: 40,
+        padding: config?.basicsPadding || undefined,
         // appendPadding: 40, 
         height: 500, // autoFit为true不生效
         width: 500, // autoFit为true不生效
