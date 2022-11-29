@@ -11,7 +11,7 @@ export default {
     // lodash: "_",
   },
   watch: {
-    include: ["packages"],
+    include: [],
   },
   output: [
     {
