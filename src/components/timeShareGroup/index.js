@@ -1,5 +1,11 @@
+/*
+ * @Author: liuhanchuan 
+ * @Date: 2022-11-30 15:17:46 
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2022-11-30 15:28:27
+ * 支持配置多条折线、图例绑定数据、
+ */
 import * as d3 from "d3";
-import { line } from "d3";
 import dataObj from './data'
 function timeShareGroup(container, data, config = {}) {
     config = {
@@ -7,29 +13,38 @@ function timeShareGroup(container, data, config = {}) {
         marginRight: 0,
         marginTop: 40,
         marginBottom: 30,
-        strokeWidth: 2, // 设置线粗细
-        strokeColor: 'red', // 设置线宽度
+        yAxis: [{
+                name: 'now',
+                strokeWidth: 2,
+                strokeColor: 'red',
+                legend: true,
+                axis: true,
+            },
+            {
+                name: 'average',
+                strokeWidth: 2,
+                strokeColor: 'blue',
+                legend: false,
+                axis: true,
+            },
+            {
+                name: 'volumeRatio',
+                strokeWidth: 2,
+                strokeColor: 'yellow',
+                legend: true,
+                axis: true,
+            }],
     }
-    let legendData = [{
-        name: '上证指数',
-        value: 'now',
-        isShow: true,
-    }, {
-        name: '深证指数',
-        value: 'average',
-        isShow: true,
-    }, {
-        name: '创业版指数',
-        value: 'volumeRatio',
-        isShow: true,
-    }]
     data = dataObj
     const height = container.offsetHeight;
     const width = container.offsetWidth;
     const timeData = data.data;
     const X = timeData.map((d) => d.label);
-    const Y = [...timeData.map((d) => d.now), ...timeData.map((d) => d.average), ...timeData.map((d) => d.volumeRatio)];
-
+    let Y = [];
+    config.yAxis.forEach((item) => {
+        Y.push(d3.min(timeData.map((d) => d[item.name])) * 1)
+        Y.push(d3.max(timeData.map((d) => d[item.name])) * 1)
+    })
     const xDomain = X;
     const yDomain = [d3.min(Y) * 1, d3.max(Y) * 1];
 
@@ -60,23 +75,23 @@ function timeShareGroup(container, data, config = {}) {
     drawTitle()
     // 绘制legend
     const drawLegend = () => {
-        let legends = svg.selectAll(".legend").data(legendData);
+        let legends = svg.selectAll(".legend").data(config.yAxis);
         legends.enter()
         .append("foreignObject")
         .attr('y', config.marginTop)
-        .attr('x', (d, i) => width - (legendData.length - i) * 100)
+        .attr('x', (d, i) => width - (config.yAxis.length - i) * 100)
         .attr("width", 100)
         .attr("height", 24)
         .style("transform", "translateY(-40px)")
         .append("xhtml:div")
         .attr('class', 'legend')
         .merge(legends)
-        .style('color', d => d.isShow ? '#000' : 'red')
+        .style('color', d => d.legend ? '#000' : 'red')
         .html(d => d.name)
         .on('click', (el, d) => {
-            legendData.forEach((val) => {
+            config.yAxis.forEach((val) => {
                 if (val.name === d.name) {
-                    val.isShow = !val.isShow
+                    val.legend = !val.legend
                 }
             })
             drawLegend()
@@ -198,19 +213,9 @@ function timeShareGroup(container, data, config = {}) {
     //画线
     const drawLine = () => {
         let lineData = []
-        legendData.forEach((item) => {
-            if (item.isShow) {
-                switch (item.value) {
-                    case 'now':
-                        lineData.push(timeData.map(d => d.now))
-                        break;
-                    case 'average':
-                        lineData.push(timeData.map(d => d.average))
-                        break;
-                    default:
-                        lineData.push(timeData.map((d) => d.volumeRatio))
-                        break;
-                }
+        config.yAxis.forEach((item) => {
+            if (item.legend) {
+                lineData.push(timeData.map(d => d[item.name]))
             }
         })
         for (let j = 0; j < lineData.length; j++) {
@@ -225,8 +230,8 @@ function timeShareGroup(container, data, config = {}) {
                 .append("path")
                 .attr("fill", "none")
                 .attr("class", "line now_line")
-                .attr("stroke", config.strokeColor)
-                .attr("stroke-width", config.strokeWidth)
+                .attr("stroke", config.yAxis.filter(item => item.legend)[j].strokeColor)
+                .attr("stroke-width", config.yAxis.filter(item => item.legend)[j].strokeWidth)
                 .attr("d", pathLine(d3.range(currentLineData.length)));
             const svgLineTotalLength = svgLine.node().getTotalLength();
 
