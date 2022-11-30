@@ -1,6 +1,13 @@
 import DataSet from '@antv/data-set';
 import { Chart } from '@antv/g2';
 function drawKTurnover(container, data, config = {}) {
+    let titleDom = document.createElement('div')
+    let d3Container = document.createElement('div')
+    titleDom.innerText = 'K线-成交量'
+    titleDom.setAttribute('style', 'font-size: 16px; font-weight: bold; height: 24px; line-height: 24px')
+    d3Container.setAttribute('style', 'height: calc(100% - 24px)');
+    container.appendChild(titleDom)
+    container.appendChild(d3Container)
     // 设置状态量，时间格式建议转换为时间戳，转换为时间戳时请注意区间
     const ds = new DataSet();
     const dv = ds.createView();
@@ -14,7 +21,7 @@ function drawKTurnover(container, data, config = {}) {
         }
     });
     const chart = new Chart({
-        container: container,
+        container: d3Container,
         autoFit: true,
         padding: config?.basicsPadding || undefined,
         height: 500, // autoFit为true不生效

@@ -81,9 +81,7 @@ function timeShareGroup(container, data, config = {}) {
             })
             drawLegend()
             svg.selectAll('.line').remove()
-            svg.selectAll('.the_last_point').remove()
             drawLine()
-            theLastPoint()
 
         })
     }
@@ -243,41 +241,18 @@ function timeShareGroup(container, data, config = {}) {
     };
     drawLine();
 
-    //画最后一个点
-    const theLastItem = timeData[timeData.length - 1];
-    const theLastPoint = () => {
-        if (theLastItem && legendData[0].isShow) {
-            svg
-            .append("circle")
-            .attr("class", "the_last_point")
-            .attr("cx", xScale(theLastItem.label))
-            .attr("cy", yScale(theLastItem.now))
-            .attr("r", config.strokeWidth * 2)
-            .attr("stroke-width", config.strokeWidth)
-            .attr("stroke", config.strokeColor)
-            .attr("fill", "#fff")
-            .attr("style", `transform: translateX(-${config.strokeWidth * 2}px)`)
-            .attr("opacity", 0)
-            .transition()
-            .delay(400)
-            .duration(200)
-            .attr("opacity", 1);
-        }
-        
-    }
-    theLastPoint()
 
     // 注销当前图表
     const destroy = () => {
         container.innerHTML = ''
-      }
-      // 渲染当前图表
-      const render = () => {
+    }
+    // 渲染当前图表
+    const render = () => {
         container.appendChild(svg.node());
-      }
-      svg.destroy = destroy
-      svg.render = render
-      return svg
+    }
+    svg.destroy = destroy
+    svg.render = render
+    return svg
 }
 
 export default timeShareGroup

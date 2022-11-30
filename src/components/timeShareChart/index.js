@@ -30,17 +30,20 @@ function barD3Chart(container, data, config = {}) {
       .attr("viewBox", [0, 0, width, height])
       .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
     // 画标题
-    svg.append('g')
-    .attr('class', 'chart_title')
-    .append("text")
-    .text('分时')
-    .attr('x', config.marginLeft)
-    .attr('y', 24)
-    .attr("style", "fill: #000; font-size: 16px; font-weight: bold")
-    .attr("opacity", "0")
-    .transition()
-    .duration(200)
-    .attr("opacity", "1");
+    const drawTitle = () => {
+      svg.append('g')
+      .attr('class', 'chart_title')
+      .append("text")
+      .text('分时')
+      .attr('x', config.marginLeft)
+      .attr('y', config.marginTop)
+      .attr("style", "fill: #000; font-size: 16px; font-weight: bold; transform: translateY(-24px);")
+      .attr("opacity", "0")
+      .transition()
+      .duration(200)
+      .attr("opacity", "1");
+    }
+    drawTitle()
     //画网格
     const yTick = [1, 2, 3, 4, 5, 6];
     const yTickSpace = (height - config.marginTop - config.marginBottom) / (yTick.length - 1);

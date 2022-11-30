@@ -6,7 +6,6 @@ class G2_Chart extends HTMLElement {
   constructor() {
     super();
     this.chart = null
-    this.dataApiConfig = {}
     let shadow = this.attachShadow({ mode: 'open' });
     let container = document.createElement('div');
     shadow.appendChild(container);
@@ -30,11 +29,12 @@ class G2_Chart extends HTMLElement {
     return new Promise(async (resolve, reject) => {
       let chartData = [];
       let chartConfig = {};
+      let apiConfig = {}
       // 获取数据
       if (this.getAttribute('data-api-config')) {
         try {
-          this.dataApiConfig = JSON.parse(this.getAttribute('data-api-config'))
-          chartData = await chartApi(this.dataApiConfig)
+          apiConfig = JSON.parse(this.getAttribute('data-api-config'))
+          chartData = await chartApi(apiConfig)
         } catch (error) {
           reject(error)
         }
@@ -50,7 +50,7 @@ class G2_Chart extends HTMLElement {
       // 渲染图表
       if (this.getAttribute('data-chart-type')) {
         try {
-          this.chart = currentChart(this.getAttribute('data-chart-type'))(this.shadowRoot.childNodes[0], chartData, chartConfig instanceof Object && Object.keys(chartConfig).length > 0 ? chartConfig : null, this.dataApiConfig)
+          this.chart = currentChart(this.getAttribute('data-chart-type'))(this.shadowRoot.childNodes[0], chartData, chartConfig instanceof Object && Object.keys(chartConfig).length > 0 ? chartConfig : null, apiConfig)
           if (this.chart?.render) {
             this.chart.render()
           }
