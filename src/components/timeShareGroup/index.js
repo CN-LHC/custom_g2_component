@@ -2,8 +2,10 @@
  * @Author: liuhanchuan 
  * @Date: 2022-11-30 15:17:46 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2022-11-30 15:28:27
- * 支持配置多条折线、图例绑定数据、
+ * @Last Modified time: 2022-11-30 16:59:58
+ * 支持配置多条折线、图例绑定数据、支持双y轴(可控制)
+ *  图例: 显示是根据yAxis的数量
+ *  双y轴: 当yAxis的数量>=3或=1，只显示一个y轴; 当yAxis的数量=2，且axis都是true显示双y轴
  */
 import * as d3 from "d3";
 import dataObj from './data'
@@ -32,8 +34,9 @@ function timeShareGroup(container, data, config = {}) {
                 strokeWidth: 2,
                 strokeColor: 'yellow',
                 legend: true,
-                axis: true,
-            }],
+                axis: false,
+            }
+        ],
     }
     data = dataObj
     const height = container.offsetHeight;
@@ -45,13 +48,19 @@ function timeShareGroup(container, data, config = {}) {
         Y.push(d3.min(timeData.map((d) => d[item.name])) * 1)
         Y.push(d3.max(timeData.map((d) => d[item.name])) * 1)
     })
-    const xDomain = X;
-    const yDomain = [d3.min(Y) * 1, d3.max(Y) * 1];
-
     // 比例尺
+    const xDomain = X;
     const xScale = d3.scalePoint(xDomain, [config.marginLeft, ((width - config.marginLeft - config.marginRight) * timeData.length) / 241 + config.marginLeft]);
-    const yScale = d3.scaleLinear(yDomain, [height - config.marginBottom, config.marginTop]);
 
+    let yDomain1 = [d3.min(Y) * 1, d3.max(Y) * 1];
+    let yDomain2 = [];
+    // 当显示双y轴的时候
+    if (config.yAxis.length === 2 && config.yAxis.filter(item => item.axis).length === 2) {
+        yDomain1 = [d3.min(timeData.map((d) => d[config.yAxis[0].name])) * 1, d3.max(timeData.map((d) => d[config.yAxis[0].name])) * 1];
+        yDomain2 = [d3.min(timeData.map((d) => d[config.yAxis[1].name])) * 1, d3.max(timeData.map((d) => d[config.yAxis[1].name])) * 1];
+    }
+    const yScale1 = d3.scaleLinear(yDomain1, [height - config.marginBottom, config.marginTop]);
+    const yScale2 = d3.scaleLinear(yDomain2, [height - config.marginBottom, config.marginTop]);
     const svg = d3
       .create("svg")
       .attr("width", width)
@@ -129,12 +138,13 @@ function timeShareGroup(container, data, config = {}) {
 
     //画xy轴数据
     const drawXYTicks = () => {
-        // y轴
-        svg
+        // y1轴 当有一个或一个以上的y轴配置显示y轴
+        if (config.yAxis.filter(item => item.axis).length > 0) {
+            svg
             .append("g")
             .attr("class", "y_tick_group")
             .selectAll("text")
-            .data([d3.max(Y).toFixed(2) * 1, ((d3.min(Y).toFixed(2) * 1 + d3.max(Y).toFixed(2) * 1) / 2).toFixed(2) * 1, d3.min(Y).toFixed(2) * 1])
+            .data([yDomain1[0].toFixed(2), yDomain1.reduce((a, b) => a + b).toFixed(1), yDomain1[0].toFixed(1)])
             .enter()
             .append("text")
             .attr("class", (d, i) => {
@@ -172,6 +182,52 @@ function timeShareGroup(container, data, config = {}) {
             .transition()
             .duration(200)
             .attr("opacity", "1");
+        }
+        // y2轴 显示双y轴
+        if (yDomain2.length === 2) {
+            svg
+            .append("g")
+            .attr("class", "y_tick_group")
+            .selectAll("text")
+            .data([yDomain2[0].toFixed(2), yDomain2.reduce((a, b) => a + b).toFixed(1), yDomain2[0].toFixed(1)])
+            .enter()
+            .append("text")
+            .attr("class", (d, i) => {
+            if (i == 0) {
+                return " y_tick_value y_tick_max";
+            } else if (i == 1) {
+                return " y_tick_value y_tick_middle";
+            } else if (i == 2) {
+                return " y_tick_value y_tick_min";
+            }
+            })
+            .text((d) => d)
+            .attr("x", width - config.marginLeft - config.marginRight - 40)
+            .attr("y", (d, i) => {
+            if (i == 0) {
+                return config.marginTop;
+            } else if (i == 1) {
+                return (height - config.marginBottom - config.marginTop) / 2 + config.marginTop;
+            } else if (i == 2) {
+                return height - config.marginBottom;
+            }
+            })
+            .attr("text-anchor", "start")
+            .attr("dy", (d, i) => {
+            if (i == 0) {
+                return "1.2em";
+            } else if (i == 1) {
+                return "0.5em";
+            } else if (i == 2) {
+                return -5;
+            }
+            })
+            .attr("fill", (d, i) => (i == 0 ? "#FF3B30" : i == 2 ? "#18AA0C" : "#666"))
+            .attr("opacity", "0")
+            .transition()
+            .duration(200)
+            .attr("opacity", "1");
+        }
         // x轴
         const xTicks = ["9:30", "11:30/13:00", "15:00"]
         svg
@@ -224,7 +280,23 @@ function timeShareGroup(container, data, config = {}) {
             .line()
             .curve(d3.curveLinear)
             .x((i) => xScale(X[i]))
-            .y((i) => yScale(currentLineData[i]));
+            .y((i) => {
+                if (yDomain2.length === 2) {
+                    if (lineData.length === 2) {
+                        return j === 0 ? yScale1(currentLineData[i]) : yScale2(currentLineData[i])
+                    } else {
+                        let index = 0;
+                        config.yAxis.forEach((item, i) => {
+                            if (item.legend) {
+                                index = i
+                            }
+                        })
+                        return index ? yScale2(currentLineData[i]) : yScale1(currentLineData[i])
+                    }
+                } else {
+                    return yScale1(currentLineData[i])
+                }
+            });
 
             const svgLine = svg
                 .append("path")
