@@ -251,7 +251,16 @@ function barD3Chart(container, data, config = {}) {
       theLastPoint(theLastItem)
     }
 
-    container.appendChild(svg.node());
+    // 注销当前图表
+    const destroy = () => {
+      container.innerHTML = ''
+    }
+    // 渲染当前图表
+    const render = () => {
+      container.appendChild(svg.node());
+    }
+    svg.destroy = destroy
+    svg.render = render
     return svg
 }
 

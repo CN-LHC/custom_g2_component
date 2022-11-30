@@ -15,23 +15,24 @@
 </head>
 <body>
     <div class="container">
+        <!-- 分时 -->
         <!-- <g2-chart id="g2Chart"
             data-chart-type="timeShareChart"
             data-api-config=''
             data-chart-config=''
         ></g2-chart> -->
-        <!-- <g2-chart id="g2Chart"
-            data-chart-type="kLine"
-            data-api-config='{"url":"https://dtdataapi.wedengta.com/FinanceValue/day_qt_performance","body":{"SecuCode":"001336", "days":"60日"},"selectKeys":["TradingDay", "OpenPrice","HighPrice","LowPrice", "ClosePrice"]}'
-            data-chart-config='{}'
-        ></g2-chart> -->
-        <!-- "basicsPadding":60 -->
-        <g2-chart
+        <!-- k线-成交量 -->
+        <!-- <g2-chart
             data-chart-type="kTurnoverChart"
             data-api-config='{"url":"https://dtdataapi.wedengta.com/FinanceValue/day_qt_performance","method":"POST","contentType":"application/json","body":{"SecuCode":"001336","days":"60日"},"selectKeys":["TradingDay","OpenPrice","HighPrice","LowPrice","ClosePrice","TurnoverVolume"]}'
             data-chart-config='{"xAxisVisible":true,"xScaleTickCount":3,"xAxisLabelSize":14,"xAxisLabelColor":"#606266","yAxisVisible":true,"yScaleTickCount":3,"yAxisLabelSize":14,"yAxisLabelColor":"#606266","riseColor":"#f04864","fallColor":"#2fc25b","basicsPadding":20}'
         >
-        </g2-chart>
+        </g2-chart> -->
+        <g2-chart id="g2Chart"
+            data-chart-type="timeShareGroup"
+            data-api-config=''
+            data-chart-config=''
+        ></g2-chart> 
     </div>
 </body>
 </html>
